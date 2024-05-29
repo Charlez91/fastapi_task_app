@@ -1,0 +1,13 @@
+__pycache__
+
+.env
+
+.test.env
+
+database.db
+
+venv
+
+env
+
+.pytest_cache
