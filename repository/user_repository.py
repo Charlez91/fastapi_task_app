@@ -23,8 +23,8 @@ class UserRepository:
         user = self._session.query(User).filter_by(username=username).first()
         return user
     
-    def create(self, data:Dict)->Type[User]:
-        user = User(**data)
+    def create(self, data:Dict)->User:
+        user : User= User(**data)
         self._session.add(user)
         self._session.commit()
         self._session.refresh(user)

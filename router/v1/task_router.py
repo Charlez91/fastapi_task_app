@@ -15,5 +15,5 @@ router = APIRouter(
 
 @router.get("/{id}", summary="Retrieve a Task", status_code=200)
 async def get_task(id:UUID4, session: Session = Depends(get_db)):
-    task:Type[Task] = await session.query(Task).get(id)
+    task:Type[Task] | None =  session.query(Task).get(id)
     return task

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from schemas.user_schemas import IUserRO, CreateUserDTO, IUser, TokenSchema, LoginUserDTO, UpdateUserDTO
 from services.user_service import UserService
 from config.database import get_db
-from utils.deps import get_current_user
+from utils.deps import get_current_user, validate_refresh_token
 from utils.auth import verify_password, create_access_token, create_refresh_token
 
 router = APIRouter(
@@ -28,7 +28,7 @@ async def register(data: Annotated[CreateUserDTO, Body()], session:Annotated[Ses
     return _service.create(data)
 
 
-@router.post("/login", summary="Login User to Obtain Tokens", response_model=TokenSchema)
+@router.post("/login", summary="Login User to Obtain Access Tokens", response_model=TokenSchema)
 async def login(data:Annotated[OAuth2PasswordRequestForm, Depends()], session:Annotated[Session, Depends(get_db)]):
     _service = UserService(session)
     user = _service.find_by_username(data.username)
@@ -40,6 +40,12 @@ async def login(data:Annotated[OAuth2PasswordRequestForm, Depends()], session:An
     
     tokens = { "access_token":create_access_token(user.email), "refresh_token":create_refresh_token(user.email)}
 
+    return TokenSchema(**tokens)
+
+
+@router.get("/refresh_token", summary="Refresh Login access token", response_model=TokenSchema)
+async def refresh_access_token(user : Annotated[IUser, Depends(validate_refresh_token)]):
+    tokens = { "access_token":create_access_token(user.email), "refresh_token":create_refresh_token(user.email)}
     return TokenSchema(**tokens)
 
 
