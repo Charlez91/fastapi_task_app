@@ -47,7 +47,7 @@ async def get_current_user(session:Session= Depends(get_db), token: str = Depend
         print(payload)
         token_data = TokenPayload(**payload)
         
-        if datetime.fromtimestamp(token_data.exp) < datetime.now():
+        if datetime.fromtimestamp(token_data.exp, UTC) < datetime.now(UTC):
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,
                 detail="Token expired",
@@ -80,7 +80,7 @@ async def validate_refresh_token(session:Session= Depends(get_db), token: str = 
         print(payload)
         token_data = TokenPayload(**payload)
         
-        if datetime.fromtimestamp(token_data.exp) < datetime.now():
+        if datetime.fromtimestamp(token_data.exp, UTC) < datetime.now(UTC):
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,
                 detail="Token expired",
